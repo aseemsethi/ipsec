@@ -1,19 +1,6 @@
-#include "stdio.h"
-#include "stdlib.h"
+#include "sim.h"
 
-// IKE STATES
-#define NO_CHANGE 4
-#define IKE_START_STATE 0
-#define IKE_INIT_STATE 1
-#define IKE_AUTH_STATE 2
-#define IKE_ESTAB_STATE 3
-
-#define INIT_EVENT 0
-#define TIMEOUT_EVENT 1
-#define DATA_EVENT 2
-#define REDIRECT_EVENT 3
-
-#define FSM_Q_SIZE 1000
+ipsecCfg cfg;
 
 typedef struct {
 	int ikeEvent;
@@ -25,9 +12,6 @@ fsmParam *ikeFsmQ[FSM_Q_SIZE];
 int ikeFsmQHead = 0;
 int ikeFsmQTail = 0;
 
-typedef struct {
-	int     curState;
-} ikeStruct;
 
 char* eventToString(int event) {
     switch(event) {
@@ -176,5 +160,10 @@ ikeFsmExecute (ikeStruct *ike, int ikeEvent, unsigned char *fsmBuff)
 
 main() {
 	printf("\n IPSec sim started..");
+	strcpy(cfg.utIP, "192.168.11.4");
+	getSelfIpAddress();
+	initDataSocket();
+	printf("\n");
+	recvPackets();
 	return 1;
 }
