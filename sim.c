@@ -54,6 +54,7 @@ int dataEvent (ikeStruct *ike, int ikeEvent, unsigned char *buff) {
 	return 1;
 }
 int ikeStart (ikeStruct *ike, int ikeEvent, unsigned char *buff) {
+	printf("\n ikeStart called !"); fflush(stdout);
 	if (buff != NULL)
 		free(buff);
 	return 1;
@@ -98,6 +99,7 @@ fsmRoutine() {
         // "do" is done here, since when Q is full, QHead = QTail
         do {
             if (ikeFsmQ[ikeFsmQHead] != 0) {
+					printf("\n Recv event in FSM thread.."); fflush(stdout);
                     fp = ikeFsmQ[ikeFsmQHead];
                     ike = fp->ike;
                     fsmBuff = fp->fsmBuff;
@@ -146,6 +148,7 @@ ikeFsmExecute (ikeStruct *ike, int ikeEvent, unsigned char *fsmBuff)
     fp->fsmBuff = fsmBuff;
 
     if (ikeFsmQ[ikeFsmQTail] == 0) {
+		printf("\n FSMQTail was 0");
         ikeFsmQ[ikeFsmQTail] = fp;
         if (ikeFsmQTail == FSM_Q_SIZE-1) {
             printf("ikeFsmQTail wraps to 0\n");
@@ -159,11 +162,19 @@ ikeFsmExecute (ikeStruct *ike, int ikeEvent, unsigned char *fsmBuff)
 
 
 main() {
+	int status;
+	pthread_t fsmThread;
+
 	printf("\n IPSec sim started..");
 	strcpy(cfg.utIP, "192.168.11.4");
+    status = pthread_create(&fsmThread, NULL, &fsmRoutine, (void*)NULL);
+    if (status != 0) {
+    	perror("FSM Thread Error:"); return -1;
+	}
 	getSelfIpAddress();
 	initDataSocket();
 	printf("\n");
+    ikeFsmExecute(&(cfg.ike), INIT_EVENT, NULL);
 	recvPackets();
 	return 1;
 }
