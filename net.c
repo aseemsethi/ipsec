@@ -125,3 +125,122 @@ initDataSocket() {
 
     printf("\nUDP IKE Socket createdto UT %s", cfg.utIP);
 }
+
+ushort ipcrc (ushort *p, int count)
+{
+    uchar *ptr = (uchar *) p;           /* damn prototypes */
+    int crc;
+    ushort i, *data;
+
+    count = (count+1) >> 1;
+    data = (ushort *) ptr;
+    crc = 0;
+    for (i = 0; i < count; i++)
+        crc += *data++;         /* 2's complement add the next header word*/
+    /* Add once to get first overflow */
+    crc = (crc & 0xFFFF) + (crc >> 16);
+    /* Add again to catch overflows caused by above */
+    crc += crc >> 16;
+    i = (short) crc;
+    return (~i);
+}
+
+
+uint16_t udp_checksum(const void *buff, size_t len, in_addr_t src_addr,
+                    in_addr_t dest_addr)
+{
+        const uint16_t *buf=buff;
+        uint16_t *ip_src=(void *)&src_addr, *ip_dst=(void *)&dest_addr;
+        uint32_t sum;
+        size_t length=len;
+
+        // Calculate the sum
+        sum = 0;
+        while (len > 1)
+        {
+                sum += *buf++;
+                if (sum & 0x80000000)
+                        sum = (sum & 0xFFFF) + (sum >> 16);
+                len -= 2;
+        }
+
+        if ( len & 1 )
+                // Add the padding if the packet lenght is odd 
+                sum += *((uint8_t *)buf);
+
+        // Add the pseudo-header                              
+        sum += *(ip_src++);
+        sum += *ip_src;
+
+        sum += *(ip_dst++);
+        sum += *ip_dst;
+
+        sum += htons(IPPROTO_UDP);
+        sum += htons(length);
+
+        // Add the carries                                   
+        while (sum >> 16)
+                sum = (sum & 0xFFFF) + (sum >> 16);
+
+        // Return the one's complement of sum               
+        return ( (uint16_t)(~sum)  );
+}
+
+
+sendData (ikeStruct *ike, char* buff, int length) {
+    unsigned char *ptr;
+    struct iphdr *ip;
+    struct udpheader *udp;
+    int sent;
+
+    ptr = buff-IPV4_UDP_SIZE;
+    // Put an IPv4 Hdr
+    //   45                 # Version / Header Length
+    //   00                 # Type of service
+    //   00 3c              # Total length
+    //   00 a5              # Identification
+    //   00 00              # Flags / Fragment offset
+    //   80                 # Time to live
+    //   01                 # Protocol
+    //   b8 c8              # Checksum
+    //   c0 a8 00 02        # Source address
+    //   c0 a8 00 01        # Destination address
+
+    ip = (struct iphdr*)ptr;
+    ip->version = 4; /* version of IP used */
+    ip->ihl = 5; /* Internet Header Length (IHL) */
+    ip->tos = 0; /* Type Of Service (TOS) */
+    ip->tot_len = htons(length+IPV4_UDP_SIZE); /* total length of the IP datagram */
+    ip->id = 0; /* identification */
+    ip->frag_off = htons(0x4000); /* fragmentation flag */
+    ip->ttl = 64; /* Time To Live (TTL) */
+    ip->check=0;
+    ip->protocol = IPPROTO_UDP;
+    ip->saddr = inet_addr(ike->srcIP); /* source address */
+    if (ike->redirected == FALSE)
+        ip->daddr = inet_addr(cfg.utIP); /* destination address */
+    else
+        ip->daddr = ike->redirected_ip; /* destination address */
+    ip->check=ipcrc((unsigned short *)ip,sizeof(struct iphdr));
+    ptr = ptr + 20;
+
+    udp = (struct udpheader*)ptr;
+    // Fabricate the UDP header
+    udp->udph_srcport = htons(ike->srcPort);
+    // Destination port number
+    udp->udph_destport = htons(500);
+    udp->udph_len = htons(sizeof(struct udpheader)+length);
+    udp->udph_chksum = 0x0;
+    udp->udph_chksum = (udp_checksum(ptr, length+8, ip->saddr, ip->daddr));
+
+    printf("\n Sending %d Bytes", length);
+    sent = sendto(cfg.sock, buff-IPV4_UDP_SIZE, length+IPV4_UDP_SIZE, 0,
+        (struct sockaddr*)&cfg.sll, sizeof(cfg.sll));
+    if(sent == -1) {
+        perror("send:");
+    } else {
+        printf(" Sent %d Bytes", sent);
+    }
+    fflush(stdout);
+}
+

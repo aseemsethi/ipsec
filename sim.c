@@ -53,12 +53,6 @@ int dataEvent (ikeStruct *ike, int ikeEvent, unsigned char *buff) {
 		free(buff);
 	return 1;
 }
-int ikeStart (ikeStruct *ike, int ikeEvent, unsigned char *buff) {
-	printf("\n ikeStart called !"); fflush(stdout);
-	if (buff != NULL)
-		free(buff);
-	return 1;
-};
 
 static fsmStruct ikeFsm[4][4] = {
 	{ /* IKE_START */

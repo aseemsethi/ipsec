@@ -18,6 +18,15 @@ typedef unsigned long u32;
 typedef unsigned char uchar;
 typedef unsigned char u8;
 
+#include "ikev2.h"
+
+
+#define TRUE 1
+#define FALSE 0
+#define IPV4_UDP_SIZE 28
+#define IPV6_UDP_SIZE 48 
+
+
 // IKE STATES
 #define NO_CHANGE 4
 #define IKE_START_STATE 0
@@ -32,14 +41,44 @@ typedef unsigned char u8;
 
 #define FSM_Q_SIZE 1000
 #define IPV4_UDP_LEN 28
-#define IKEV2_SPI_LEN 8
+
+struct udpheader {
+ unsigned short int udph_srcport;
+ unsigned short int udph_destport;
+ unsigned short int udph_len;
+ unsigned short int udph_chksum;
+};
 
 typedef struct {
 	int     curState;
+    char    srcIP[20];
+    int     srcPort;
     
     // Used for all recvd buffers
     char        rBuff[1024];
     int     rLen;
+
+	// IKEv2 specific variable
+    u8      i_spi[IKEV2_SPI_LEN]; /* IKE_SA Initiator's SPI */
+    u8      r_spi[IKEV2_SPI_LEN]; /* IKE_SA Responder's SPI */
+
+    struct      ikev2_payloads payloads;
+    struct      ikev2_proposal_data ourProp;  // what we we propose
+    struct      ikev2_proposal_data prop;  // what we recvd from peer
+
+    unsigned char       *i_dh_private;
+    size_t      r_dh_public_len;
+    struct      dh_group *dh;
+    u8			i_nonce[IKEV2_NONCE_MAX_LEN];
+    size_t      i_nonce_len;
+    // Have we been re-drected ? This var is TRUE, if yes
+    int redirected;
+    u32 redirected_ip;
+
+    // save the SA_INIT pkt for any retransmits
+    char        saInitBuff[1024];
+    int			saInitLen;
+
 } ikeStruct;
 
 typedef struct {
@@ -84,3 +123,4 @@ typedef struct {
                              (((u32) (a)[2]) << 8) | ((u32) (a)[3]))
 #define GET_BE16(a) ((u16) (((a)[0] << 8) | (a)[1]))
 
+int ikeStart(ikeStruct*, int, unsigned char*);
