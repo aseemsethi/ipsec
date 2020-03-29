@@ -71,6 +71,7 @@ char* getSelfIpAddress() {
     close(fd);
     strcpy(cfg.selfIP,
         inet_ntoa(((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr));
+    strcpy(cfg.ike.srcIP, cfg.selfIP);
     printf("\nSelf IP Address: %s", cfg.selfIP);
 }
 

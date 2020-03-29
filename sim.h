@@ -49,6 +49,11 @@ struct udpheader {
  unsigned short int udph_chksum;
 };
 
+struct ikev2_keys {
+    u8 *SK_d, *SK_ai, *SK_ar, *SK_ei, *SK_er, *SK_pi, *SK_pr;
+    size_t SK_d_len, SK_integ_len, SK_encr_len, SK_prf_len;
+};
+
 typedef struct {
 	int     curState;
     char    srcIP[20];
@@ -74,10 +79,32 @@ typedef struct {
     // Have we been re-drected ? This var is TRUE, if yes
     int redirected;
     u32 redirected_ip;
+    struct      ikev2_keys keys;
+    u8      	*IDi;
+    size_t      IDi_len;
+    void        *cb_ctx;
+    void        *shared_secret;
+    int     	shared_secret_len;
+    unsigned char   user_password[10];
+    int     	user_password_len;
+    unsigned char   *shared;
+    int     	shared_len;
+    u8      	*key_pad;
+    size_t      key_pad_len;
 
     // save the SA_INIT pkt for any retransmits
     char        saInitBuff[1024];
     int			saInitLen;
+
+    // Child SA SPIs
+    u32 		child_i_spi;
+    u32 		child_r_spi;
+    // Recvd from Responders
+    char        *r_dh_public; 
+    u8      	*IDr;
+    size_t      IDr_len;
+    char        *r_nonce;
+    int     	r_nonce_len;
 
 } ikeStruct;
 

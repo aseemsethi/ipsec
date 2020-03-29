@@ -10,10 +10,45 @@ hexdump(unsigned char* buf, int len) {
 }
 
 initVars() {
+    char ID[10] = "IkeSim";
+    char i_str[IKEV2_SPI_LEN];
+    int identity_len = 4;
+
     cfg.ike.ourProp.integ = AUTH_HMAC_SHA1_96;
     cfg.ike.ourProp.prf = PRF_HMAC_SHA1;
     cfg.ike.ourProp.encr = ENCR_AES_CBC;
     cfg.ike.ourProp.dh = DH_GROUP5_1536BIT_MODP;
+    cfg.ike.redirected = FALSE;
+
+    cfg.ike.key_pad = (u8 *)strdup("Key Pad for IKEv2");
+    if (cfg.ike.key_pad == NULL) {
+        printf("\nkey_pad malloc failed");
+        return -1;
+    }
+    cfg.ike.key_pad_len = 17;
+
+    memset(cfg.ike.i_spi, 0, IKEV2_SPI_LEN);
+    sprintf(i_str, "%d", 1);
+    memcpy(cfg.ike.i_spi, i_str, strlen(i_str));
+    printf(", i_spi = %s", cfg.ike.i_spi);
+    cfg.ike.srcPort = 4000;
+    cfg.ike.child_i_spi = 100000;
+
+    cfg.ike.IDi = strdup(strcat(ID, i_str));
+    strcpy(ID, "IkeSim"); // reset ID back to IkeSim
+    cfg.ike.IDi_len = strlen(cfg.ike.IDi);
+    
+    // Default identity for Other Server
+    cfg.ike.IDr = malloc(identity_len);
+    if (cfg.ike.IDr == NULL) {
+        perror("\n Cannot allocate IDr");
+    }
+    memcpy(cfg.ike.IDr, "Strong", identity_len);
+    cfg.ike.IDr_len = identity_len;
+    cfg.ike.IDr[cfg.ike.IDr_len] = '\0'; // for string operations
+
+    memcpy(cfg.ike.user_password, "password", 8);
+    cfg.ike.user_password_len = 8;
 }
 
 // This takes care of the IP + UDP Hdr we are adding later
