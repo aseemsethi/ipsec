@@ -104,9 +104,9 @@ initDataSocket() {
     cfg.sll.sll_hatype   = 1; // ARPHRD_ETHER;
     /*address length*/
     cfg.sll.sll_halen    = ETH_ALEN;
-    cfg.sll.sll_addr[0]  = 0x00; cfg.sll.sll_addr[1]  = 0x0C;
-    cfg.sll.sll_addr[2]  = 0x29; cfg.sll.sll_addr[3]  = 0x47;
-    cfg.sll.sll_addr[4]  = 0xA6; cfg.sll.sll_addr[5]  = 0xBD;
+    cfg.sll.sll_addr[0]  = 0x08; cfg.sll.sll_addr[1]  = 0x00;
+    cfg.sll.sll_addr[2]  = 0x27; cfg.sll.sll_addr[3]  = 0x05;
+    cfg.sll.sll_addr[4]  = 0xB1; cfg.sll.sll_addr[5]  = 0x35;
     cfg.sll.sll_addr[6]  = 0x0; //Not used
     cfg.sll.sll_addr[7]  = 0x0; //Not used
 	if (bind(cfg.sock, (struct sockaddr*)&cfg.sll, sizeof(cfg.sll)) < 0) {

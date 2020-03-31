@@ -1,0 +1,16 @@
+        cfg.ike[i]->IDi = strdup(strcat(ID, i_str));
+        strcpy(ID, "IkeSim"); // reset ID back to IkeSim
+        cfg.ike[i]->IDi_len = strlen(cfg.ike[i]->IDi);
+        // Default identity for Other Server
+        identity_len = 4;
+        cfg.ike[i]->IDr = malloc(identity_len);
+        if (cfg.ike[i]->IDr == NULL) {
+            perror("\n Cannot allocate IDr");
+        }
+        memcpy(cfg.ike[i]->IDr, "Strong", identity_len);
+        cfg.ike[i]->IDr_len = identity_len;
+        cfg.ike[i]->IDr[cfg.ike[i]->IDr_len] = '\0'; // for string operations
+
+        memcpy(cfg.ike[i]->user_password, "password", 8);
+        cfg.ike[i]->user_password_len = 8;
+

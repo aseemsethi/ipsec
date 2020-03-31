@@ -20,7 +20,7 @@
 int global_pv_len;
 int debug;
 
-
+#define ALL_DH_GROUPS TRUE
 #ifdef ALL_DH_GROUPS
 
 /* RFC 4306, B.1. Group 1 - 768 Bit MODP
@@ -558,8 +558,10 @@ void * dh_init(const struct dh_group *dh, unsigned char **priv)
 	void *pv;
 	size_t pv_len;
 
-	if (dh == NULL)
+	if (dh == NULL) {
+		printf("\n dh_init dh is null");
 		return NULL;
+	}
 
 	//free(*priv);
 	*priv = (unsigned char*)malloc(dh->prime_len);
@@ -591,8 +593,7 @@ void * dh_init(const struct dh_group *dh, unsigned char **priv)
 			   dh->prime, dh->prime_len, pv,
 			   &pv_len) < 0) {
 		free(pv);
-		if (debug >= 0)
-			printf("DH: crypto_mod_exp failed");
+		printf("DH: crypto_mod_exp failed");
 		return NULL;
 	}
 	//wpabuf_put(pv, pv_len);

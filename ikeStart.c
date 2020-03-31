@@ -17,7 +17,8 @@ initVars() {
     cfg.ike.ourProp.integ = AUTH_HMAC_SHA1_96;
     cfg.ike.ourProp.prf = PRF_HMAC_SHA1;
     cfg.ike.ourProp.encr = ENCR_AES_CBC;
-    cfg.ike.ourProp.dh = DH_GROUP5_1536BIT_MODP;
+    cfg.ike.ourProp.dh = DH_GROUP1_768BIT_MODP;
+// DH_GROUP5_1536BIT_MODP;
     cfg.ike.redirected = FALSE;
 
     cfg.ike.key_pad = (u8 *)strdup("Key Pad for IKEv2");
@@ -28,9 +29,10 @@ initVars() {
     cfg.ike.key_pad_len = 17;
 
     memset(cfg.ike.i_spi, 0, IKEV2_SPI_LEN);
-    sprintf(i_str, "%d", 1);
-    memcpy(cfg.ike.i_spi, i_str, strlen(i_str));
-    printf(", i_spi = %s", cfg.ike.i_spi);
+    //sprintf(i_str, "%d", 1);
+    //memcpy(cfg.ike.i_spi, i_str, strlen(i_str));
+	cfg.ike.i_spi[0] = 1;
+    //printf(", i_spi = %s", cfg.ike.i_spi);
     cfg.ike.srcPort = 4000;
     cfg.ike.child_i_spi = 100000;
 
@@ -113,7 +115,6 @@ int ikeStart (ikeStruct *ike, int ikeEvent, unsigned char *junk) {
 	memcpy(hdr->i_spi, ike->i_spi, IKEV2_SPI_LEN);
 	// IKE_SA Responder's SPI
 	memset(hdr->r_spi, 0, IKEV2_SPI_LEN);
-	//hdr->r_spi[0] = 0;
 	hdr->next_payload = IKEV2_PAYLOAD_SA;
 	hdr->version = IKEV2_VERSION; /* MjVer | MnVer */
 	hdr->exchange_type = IKE_SA_INIT;

@@ -1,0 +1,8 @@
+Download VDI from linuxvmimages
+Username: centos
+Password : centos
+(to become root, use sudo su -)
+Install strongswan - yum install strongswan
+Only 2 files to be modified - /etc/strongswan/ipsec.cong
+and ipsec.secrets
+

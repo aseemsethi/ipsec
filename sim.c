@@ -160,7 +160,7 @@ main() {
 	pthread_t fsmThread;
 
 	printf("\n IPSec sim started..");
-	strcpy(cfg.utIP, "192.168.11.4");
+	strcpy(cfg.utIP, "192.168.1.22");
     status = pthread_create(&fsmThread, NULL, &fsmRoutine, (void*)NULL);
     if (status != 0) {
     	perror("FSM Thread Error:"); return -1;
