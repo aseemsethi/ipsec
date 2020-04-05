@@ -4,6 +4,9 @@
 #define IKE_PKT_SIZE 512
 #define IKEV2_SPI_LEN 8
 #define PROPOSAL_LEN 8
+#define IKEV2_MAX_HASH_LEN 20
+#define AES_PARAM_SIZE 4
+#define TRANSFORM_SIZE 8
 
 /* Current IKEv2 version from RFC 4306 */
 #define IKEV2_MjVer 2

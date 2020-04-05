@@ -3,12 +3,6 @@
 extern ipsecCfg cfg;
 extern int global_pv_len;
 
-hexdump(unsigned char* buf, int len) {
-    int i;
-    for (i = 0; i < len; i++)
-        printf(" %02x", buf[i]);
-}
-
 initVars() {
     char ID[10] = "IkeSim";
     char i_str[IKEV2_SPI_LEN];

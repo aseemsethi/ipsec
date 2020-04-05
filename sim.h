@@ -122,14 +122,14 @@ typedef struct {
 } ipsecCfg;
 
 typedef struct {
-    char i_spi[IKEV2_SPI_LEN]; /* IKE_SA Initiator's SPI */
-    char r_spi[IKEV2_SPI_LEN]; /* IKE_SA Responder's SPI */
-    char next_payload;
-    char version; /* MjVer | MnVer */
-    char exchange_type;
-    char flags;
-    char message_id[4];
-    char length[4]; /* total length of HDR + payloads */
+    u8 i_spi[IKEV2_SPI_LEN]; /* IKE_SA Initiator's SPI */
+    u8 r_spi[IKEV2_SPI_LEN]; /* IKE_SA Responder's SPI */
+    u8 next_payload;
+    u8 version; /* MjVer | MnVer */
+    u8 exchange_type;
+    u8 flags;
+    u8 message_id[4];
+    u8 length[4]; /* total length of HDR + payloads */
 } ikev2_hdr;
 
 #define PUT_BE32(a, val)                    \

@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-g -I.
 DEPS = sim.h
-OBJ = sim.o net.o ikeStart.o crypto/os.o crypto/crypto.o crypto/dh_groups.o crypto/sha1.o crypto/md5.o
+OBJ = sim.o net.o ikeStart.o crypto/os.o crypto/crypto.o crypto/dh_groups.o crypto/sha1.o crypto/md5.o ikev2_common.o
 
 
 %.o: %.c $(DEPS)

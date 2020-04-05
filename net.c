@@ -37,6 +37,8 @@ recvPackets() {
 			 */
 			// Jump over IP+UDP Header
 			ikeHdr = (ikev2_hdr*)(buff + IPV4_UDP_LEN);
+			printf("\n Recv IKEv2 Len: %d", GET_BE32(ikeHdr->length));
+			printf("\n countTotal: %d", countTotal);
 			if (countTotal == GET_BE32(ikeHdr->length)+IPV4_UDP_LEN) {
 				printf("\n Total Pkt recvd: %d Bytes",
                         GET_BE32(ikeHdr->length));
@@ -47,6 +49,7 @@ recvPackets() {
 				} else {
 					memcpy(fsmBuff, buff+IPV4_UDP_LEN,
 						GET_BE32(ikeHdr->length));
+					printf("\nreacPackets: FSM Execute..");
 					ikeFsmExecute(ike, DATA_EVENT, fsmBuff);
 				}       
 				countTotal = 0;
